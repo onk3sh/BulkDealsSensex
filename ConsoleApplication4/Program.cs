@@ -11,50 +11,89 @@ using System.Runtime.InteropServices;
 using OpenQA.Selenium.Support.UI;
 using System.Globalization;
 
+/// <summary>
+/// The Bulk Deals Sensex namespace.
+/// Author: Onkesh Bansal
+/// Date: 10th October 2017
+/// License: MIT
+/// </summary>
 namespace BulkDealsSensex
 {
 
+    /// <summary>
+    /// Class DataContainer.
+    /// </summary>
     class DataContainer
     {
         private List<IWebElement> rows;
         private List<string> columns;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataContainer"/> class.
+        /// </summary>
         public DataContainer()
         {
             rows = new List<IWebElement>();
             columns = new List<string>();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataContainer"/> class.
+        /// </summary>
+        /// <param name="tableRows">The table rows.</param>
         public DataContainer(IList<IWebElement> tableRows)
         {
             rows = new List<IWebElement>(tableRows);
             columns = new List<string>();
         }
 
+        /// <summary>
+        /// Adds the rows.
+        /// </summary>
+        /// <param name="rowData">The row data.</param>
         public void addRows(IWebElement rowData)
         {
             this.rows.Add(rowData);
         }
 
+        /// <summary>
+        /// Sets the columns.
+        /// </summary>
+        /// <param name="columnData">The column data.</param>
         public void setColumns(IWebElement columnData)
         {
             if(columnData.Text != "No Records Found.")
                 this.columns.Add(columnData.Text);
          }
 
+        /// <summary>
+        /// Gets the rows.
+        /// </summary>
+        /// <returns>List&lt;IWebElement&gt;.</returns>
         public List<IWebElement> getRows()
         {
             return this.rows;
         }
 
+        /// <summary>
+        /// Gets the columns.
+        /// </summary>
+        /// <returns>List&lt;System.String&gt;.</returns>
         public List<string> getColumns()
         {
             return this.columns;
         }
     }
 
+    /// <summary>
+    /// Class Program.
+    /// </summary>
     static class Program
     {
+        /// <summary>
+        /// Defines the entry point of the application.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
         static void Main(string[] args)
         {
             try
@@ -63,29 +102,20 @@ namespace BulkDealsSensex
                 ChromeOptions option = new ChromeOptions();
                 option.AddArgument("--headless");
                 IWebDriver driver = new ChromeDriver(option);
-
                 DataContainer data = new DataContainer();
-
-                //IWebDriver driver = new ChromeDriver();
 
                 string URL = "http://anandrathi.accordfintech.com/Equity/BulkDeals.aspx?id=22&Option=&EXCHG=";
                 string URLBSE = URL + "BSE";
                 string URLNSE = URL + "NSE";
-                //string strtDate = "01-10-2017";
-                //string endDate =  "10-10-2017"; //start date is always lesser then end date as start date will be in the past
                 string documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 DirectoryInfo dir = new DirectoryInfo(documentsFolder);
-                //DirectoryInfo dir = new DirectoryInfo("C:\\Users\\obansal\\Documents");
-
                 //Taking arguments from command-line
                 string strtDate = args[0];
                 string endDate =  args[1]; //start date is always lesser then end date as start date will be in the past
-                string exchange = args[2];
+                string exchange = args[2]; // BSE || NSE || Both
 
                 Console.Clear();
-                Console.WriteLine("********************************Geting data from ANAND RATHI Web Table**********************************************");
-
-                //set the date and change data as per requirement
+                Console.WriteLine("********************************Getting data from ANAND RATHI Web Table**********************************************");
 
                 if (exchange.ToLower() == "bse")
                 {
@@ -119,6 +149,15 @@ namespace BulkDealsSensex
             
         }
 
+        /// <summary>
+        /// Finals the method to get data.
+        /// </summary>
+        /// <param name="driver">The driver.</param>
+        /// <param name="URL">The URL.</param>
+        /// <param name="dir">The dir.</param>
+        /// <param name="strtDate">The STRT date.</param>
+        /// <param name="endDate">The end date.</param>
+        /// <param name="exchange">The exchange.</param>
         private static void finalMethodToGetData(IWebDriver driver, string URL, DirectoryInfo dir, string strtDate, string endDate, string exchange)
         {
             driver.Navigate().Refresh();
@@ -129,6 +168,13 @@ namespace BulkDealsSensex
             outputDataToExcel(driver, bse, dir, exchange.ToUpper());
         }
 
+        /// <summary>
+        /// Fetches the data between start and end date.
+        /// </summary>
+        /// <param name="driver">The driver.</param>
+        /// <param name="strtDate">The STRT date.</param>
+        /// <param name="endDate">The end date.</param>
+        /// <returns>DataContainer.</returns>
         static DataContainer fetchDataBetweenStartAndEndDate(IWebDriver driver, string strtDate, string endDate)
         {
             DateTime d1 = changeStringToDate(strtDate);
@@ -179,6 +225,11 @@ namespace BulkDealsSensex
             return data;
         }
 
+        /// <summary>
+        /// Sets the date and wait.
+        /// </summary>
+        /// <param name="driver">The driver.</param>
+        /// <param name="date">The date.</param>
         static void setDateAndWait(IWebDriver driver, DateTime date)
         {
             changeDateInSite(driver, date);
@@ -186,6 +237,11 @@ namespace BulkDealsSensex
             System.Threading.Thread.Sleep(2000);
         }
 
+        /// <summary>
+        /// Changes the string to date.
+        /// </summary>
+        /// <param name="date">The date.</param>
+        /// <returns>DateTime.</returns>
         static DateTime changeStringToDate(string date)
         {
             //date format = "dd-MM-yyyy";
@@ -193,6 +249,11 @@ namespace BulkDealsSensex
             return dt;
         }
 
+        /// <summary>
+        /// Changes the date in site.
+        /// </summary>
+        /// <param name="driver">The driver.</param>
+        /// <param name="datevalue">The datevalue.</param>
         static void changeDateInSite(IWebDriver driver, DateTime datevalue)
         {
             SelectElement dd = new SelectElement(driver.FindElement(By.XPath(".//*[@id='ctl00_ContentPlaceHolder1_DateUsrCtl1_ddlDay']")));
@@ -214,6 +275,14 @@ namespace BulkDealsSensex
             goBtn.Click();
         }
 
+        /// <summary>
+        /// Outputs the data to excel.
+        /// </summary>
+        /// <param name="driver">The driver.</param>
+        /// <param name="data">The data.</param>
+        /// <param name="outDir">The out dir.</param>
+        /// <param name="fileName">Name of the file.</param>
+        /// <param name="flag">if set to <c>true</c> [flag].</param>
         static void outputDataToExcel(IWebDriver driver, DataContainer data, DirectoryInfo outDir, string fileName, bool flag = true)
         {
             var newFile = new FileInfo(outDir.FullName + @"\"+fileName+".xlsx");
@@ -257,6 +326,11 @@ namespace BulkDealsSensex
             Console.WriteLine("Excel file created , you can find the file at "+outDir+"\\"+fileName+".xlsx");
         }
 
+        /// <summary>
+        /// Enters the data in excel.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="worksheet">The worksheet.</param>
         private static void EnterDataInExcel(DataContainer data, ExcelWorksheet worksheet)
         {
             worksheet.Cells[1, 1].Value = "Deal Date";
@@ -299,6 +373,13 @@ namespace BulkDealsSensex
             worksheet.Cells.AutoFitColumns(0);  //Autofit columns for all cells
         }
 
+        /// <summary>
+        /// Cleanups the excel.
+        /// </summary>
+        /// <param name="xlApp">The xl application.</param>
+        /// <param name="xlWorkbook">The xl workbook.</param>
+        /// <param name="xlWorksheet">The xl worksheet.</param>
+        /// <param name="xlRange">The xl range.</param>
         private static void cleanupExcel(Excel.Application xlApp, Excel.Workbook xlWorkbook, Excel._Worksheet xlWorksheet, Excel.Range xlRange)
         {
             //add useful things here!
@@ -323,6 +404,14 @@ namespace BulkDealsSensex
             Marshal.ReleaseComObject(xlApp);
         }
 
+        /// <summary>
+        /// Dayses the left.
+        /// </summary>
+        /// <param name="startDate">The start date.</param>
+        /// <param name="endDate">The end date.</param>
+        /// <param name="excludeWeekends">The exclude weekends.</param>
+        /// <param name="excludeDates">The exclude dates.</param>
+        /// <returns>System.Int32.</returns>
         public static int DaysLeft(DateTime startDate, DateTime endDate, Boolean excludeWeekends = true, List<DateTime> excludeDates = null)
         {
             int count = 0;
@@ -350,6 +439,12 @@ namespace BulkDealsSensex
             return count;
         }
 
+        /// <summary>
+        /// Trades the days.
+        /// </summary>
+        /// <param name="startDate">The start date.</param>
+        /// <param name="endDate">The end date.</param>
+        /// <returns>List&lt;DateTime&gt;.</returns>
         public static List<DateTime> TradeDays(DateTime startDate, DateTime endDate)
         {
             List<DateTime> result = new List<DateTime>();
