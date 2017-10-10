@@ -152,7 +152,7 @@ namespace BulkDealsSensex
         /// <summary>
         /// Finals the method to get data.
         /// </summary>
-        /// <param name="driver">The driver.</param>
+        /// <param name="driver">Selenium WebDriver Object.</param>
         /// <param name="URL">The URL.</param>
         /// <param name="dir">The dir.</param>
         /// <param name="strtDate">The STRT date.</param>
@@ -171,7 +171,7 @@ namespace BulkDealsSensex
         /// <summary>
         /// Fetches the data between start and end date.
         /// </summary>
-        /// <param name="driver">The driver.</param>
+        /// <param name="driver">Selenium WebDriver Object.</param>
         /// <param name="strtDate">The STRT date.</param>
         /// <param name="endDate">The end date.</param>
         /// <returns>DataContainer.</returns>
@@ -228,7 +228,7 @@ namespace BulkDealsSensex
         /// <summary>
         /// Sets the date and wait.
         /// </summary>
-        /// <param name="driver">The driver.</param>
+        /// <param name="driver">Selenium WebDriver Object.</param>
         /// <param name="date">The date.</param>
         static void setDateAndWait(IWebDriver driver, DateTime date)
         {
@@ -252,7 +252,7 @@ namespace BulkDealsSensex
         /// <summary>
         /// Changes the date in site.
         /// </summary>
-        /// <param name="driver">The driver.</param>
+        /// <param name="driver">The selenium web driver.</param>
         /// <param name="datevalue">The datevalue.</param>
         static void changeDateInSite(IWebDriver driver, DateTime datevalue)
         {
@@ -278,7 +278,7 @@ namespace BulkDealsSensex
         /// <summary>
         /// Outputs the data to excel.
         /// </summary>
-        /// <param name="driver">The driver.</param>
+        /// <param name="driver">Selenium WebDriver Object.</param>
         /// <param name="data">The data.</param>
         /// <param name="outDir">The out dir.</param>
         /// <param name="fileName">Name of the file.</param>
@@ -405,7 +405,7 @@ namespace BulkDealsSensex
         }
 
         /// <summary>
-        /// Dayses the left.
+        /// Days count that are left.
         /// </summary>
         /// <param name="startDate">The start date.</param>
         /// <param name="endDate">The end date.</param>
