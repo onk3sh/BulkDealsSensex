@@ -219,6 +219,19 @@ namespace BulkDealsSensex
         }
 
         /// <summary>
+        /// Sets the date and wait.
+        /// </summary>
+        /// <param name="driver">Selenium WebDriver Object.</param>
+        /// <param name="date">The date.</param>
+        private static void SetDateAndWait(IWebDriver driver, DateTime date)
+        {
+            ChangeDateInSite(driver, date);
+            Console.WriteLine();
+            Console.WriteLine("Date set to " + date.ToShortDateString() + " and waiting...");
+            System.Threading.Thread.Sleep(2000);
+        }
+
+        /// <summary>
         /// Finals the method to get data.
         /// </summary>
         /// <param name="driver">Selenium WebDriver Object.</param>
@@ -229,12 +242,131 @@ namespace BulkDealsSensex
         /// <param name="exchange">The exchange.</param>
         private static void FinalMethodToGetData(IWebDriver driver, string URL, DirectoryInfo dir, string strtDate, string endDate, string exchange)
         {
+            DataContainer dc = CreateDataForExcel(driver, URL, strtDate, endDate, exchange);
+            OutputDataToExcel(dc, dir, exchange);
+        }
+
+        private static DataContainer CreateDataForExcel(IWebDriver driver, string URL, string strtDate, string endDate, string exchange)
+        {
             driver.Navigate().Refresh();
             driver.Url = URL;
             Console.WriteLine("------------------------------------Fetching data for " + exchange.ToUpper() + "-----------------------------------------");
-            DataContainer bse = new DataContainer();
-            bse = FetchDataBetweenStartAndEndDate(driver, strtDate, endDate);
-            OutputDataToExcel(bse, dir, exchange.ToUpper());
+            DataContainer dc = FetchDataBetweenStartAndEndDate(driver, strtDate, endDate);
+            return dc;
+        }
+
+        /// <summary>
+        /// Finals the method to get data.
+        /// </summary>
+        /// <param name="driver">Selenium WebDriver Object.</param>
+        /// <param name="URL">The URL.</param>
+        /// <param name="dir">The dir.</param>
+        /// <param name="strtDate">The STRT date.</param>
+        /// <param name="endDate">The end date.</param>
+        /// <param name="exchange">The exchange.</param>
+        private static void FinalMethodToGetDataForBoth(IWebDriver driver, string URL_BASE, DirectoryInfo dir, string strtDate, string endDate)
+        {
+            DataContainer data_bse = CreateDataForExcel(driver, URL_BASE + "BSE", strtDate, endDate, "bse");
+            DataContainer data_nse = CreateDataForExcel(driver, URL_BASE + "NSE", strtDate, endDate, "nse");
+
+            OutputBothDataToSameExcel(data_bse, data_nse, dir);
+        }
+
+        /// <summary>
+        /// Outputs the data to excel.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="outDir">The out dir.</param>
+        /// <param name="fileName">Name of the file.</param>
+        private static void OutputDataToExcel(DataContainer data, DirectoryInfo outDir, string exchange)
+        {
+            var fileName = exchange.ToUpper();
+            FileInfo newFile = CheckIfFileExists(outDir, fileName);
+
+            using (var package = new ExcelPackage(newFile))
+            {
+                // Add a new worksheet to the empty workbook
+                ExcelWorksheet worksheet = null;
+                worksheet = package.Workbook.Worksheets.Add("Bulk Deals " + fileName);
+
+                //Add the headers
+                EnterDataInExcel(data, worksheet);
+
+                // set some document properties
+                package.Workbook.Properties.Title = "Financial Data";
+                package.Workbook.Properties.Author = "Onkesh Bansal";
+                package.Workbook.Properties.Comments = "All data for bulk deals performed on the respective exchanges";
+
+                // set some extended property values
+                package.Workbook.Properties.Company = "Flat 221, SLS Serinity, Bangalore";
+
+                // set some custom property values
+                package.Workbook.Properties.SetCustomPropertyValue("Checked by", "Onkesh Bansal");
+                package.Workbook.Properties.SetCustomPropertyValue("AssemblyName", "EPPlus");
+                // save our new workbook and we are done!
+                package.Save();
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Excel file created , you can find the file at " + outDir + "\\" + fileName + ".xlsx");
+        }
+
+        /// <summary>
+        /// Method to export data for both exchanges to a single file
+        /// </summary>
+        /// <param name="data_bse"></param>
+        /// <param name="data_nse"></param>
+        /// <param name="outDir"></param>
+        private static void OutputBothDataToSameExcel(DataContainer data_bse, DataContainer data_nse, DirectoryInfo outDir)
+        {
+            var fileName = "BSE_NSE_BulkDeals";
+            FileInfo newFile = CheckIfFileExists(outDir, fileName);
+
+            using (var package = new ExcelPackage(newFile))
+            {
+                // Add worksheets to the empty workbook
+                package.Workbook.Worksheets.Add("BSE");
+                package.Workbook.Worksheets.Add("NSE");
+
+                //Add the headers
+                EnterDataInExcel(data_bse, package.Workbook.Worksheets["BSE"]);
+                EnterDataInExcel(data_nse, package.Workbook.Worksheets["NSE"]);
+
+                // set some document properties
+                package.Workbook.Properties.Title = "Financial Data";
+                package.Workbook.Properties.Author = "Onkesh Bansal";
+                package.Workbook.Properties.Comments = "All data for bulk deals performed on the respective exchanges";
+
+                // set some extended property values
+                package.Workbook.Properties.Company = "Flat 221, SLS Serinity, Bangalore";
+
+                // set some custom property values
+                package.Workbook.Properties.SetCustomPropertyValue("Checked by", "Onkesh Bansal");
+                package.Workbook.Properties.SetCustomPropertyValue("AssemblyName", "EPPlus");
+                // save our new workbook and we are done!
+                package.Save();
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Excel file created , you can find the file at " + outDir + "\\" + fileName + ".xlsx");
+        }
+
+        /// <summary>
+        /// Checks if the xlsx file exists in the provided directory
+        /// </summary>
+        /// <param name="outDir"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private static FileInfo CheckIfFileExists(DirectoryInfo outDir, string fileName)
+        {
+            var newFile = new FileInfo(outDir.FullName + @"\" + fileName + ".xlsx");
+            if (newFile.Exists)
+            {
+                newFile.Delete();
+                newFile = new FileInfo(outDir.FullName + @"\" + fileName + ".xlsx");
+            }
+
+            return newFile;
         }
 
         /// <summary>
@@ -257,13 +389,39 @@ namespace BulkDealsSensex
                 string documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 DirectoryInfo dir = new DirectoryInfo(documentsFolder);
                 //Taking arguments from command-line
-                string strtDate = args[0];
-                string endDate = args[1]; //start date is always lesser then end date as start date will be in the past
-                string exchange = args[2]; // BSE || NSE || Both
+                string strtDate, endDate, exchange; //start date is always lesser then end date as start date will be in the past
+
+                if (args.Length == 3)
+                {
+                    strtDate = args[0];
+                    endDate = args[1]; //start date is always lesser then end date as start date will be in the past
+                    exchange = args[2]; // BSE || NSE || Both
+                }
+                else
+                {
+                    //Fallback to generic arguments incase of missing commandline arguments
+                    strtDate = DateTime.Today.AddDays(-2).ToString("dd-MM-yyyy");
+                    endDate = DateTime.Today.AddDays(-1).ToString("dd-MM-yyyy"); //start date is always lesser then end date as start date will be in the past
+                    exchange = "both";
+                }
 
                 Console.Clear();
                 Console.WriteLine("********************************Getting data from ANAND RATHI Web Table**********************************************");
                 Console.WriteLine();
+
+                if(args.Length == 0)
+                {
+                    System.Threading.Thread.Sleep(500);
+                    Console.WriteLine("No Arguments Provided!!");
+                    System.Threading.Thread.Sleep(500);
+                    Console.WriteLine("Options: BulkDealsSensex.exe START-DATE END-DATE bse or nse or both");
+                    System.Threading.Thread.Sleep(500);
+                    Console.WriteLine("Command: BulkDealsSensex.exe dd-MM-yyyy dd-MM-yyyy both ");
+                    System.Threading.Thread.Sleep(500);
+                    Console.WriteLine("Falling back.......");
+                    System.Threading.Thread.Sleep(500);
+
+                }
 
                 if (exchange.ToLower() == "bse")
                 {
@@ -273,16 +431,15 @@ namespace BulkDealsSensex
                 {
                     FinalMethodToGetData(driver, URLNSE, dir, strtDate, endDate, exchange);
                 }
-                else
+                else if (exchange.ToLower() == "both")
                 {
-                    FinalMethodToGetData(driver, URLBSE, dir, strtDate, endDate, "bse");
-                    FinalMethodToGetData(driver, URLNSE, dir, strtDate, endDate, "nse");
+                    FinalMethodToGetDataForBoth(driver, URL, dir, strtDate, endDate);
                 }
                 driver.Quit();
             }
-            #pragma warning disable CA1031 // Do not catch general exception types
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
-            #pragma warning restore CA1031 // Do not catch general exception types
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Console.WriteLine("!!!ERROR ENCOUNTERED!!!:::");
                 Console.WriteLine(e.Message);
@@ -296,74 +453,6 @@ namespace BulkDealsSensex
                 Console.WriteLine("******************************************Press any key to exit.........********************************************");
                 Console.Read();
             }
-        }
-
-        /// <summary>
-        /// Outputs the data to excel.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        /// <param name="outDir">The out dir.</param>
-        /// <param name="fileName">Name of the file.</param>
-        private static void OutputDataToExcel(DataContainer data, DirectoryInfo outDir, string fileName)
-        {
-            bool flag = true;
-            if (fileName.ToLower() == "nse")
-            {
-                flag = false;
-            }
-
-            var newFile = new FileInfo(outDir.FullName + @"\" + fileName + ".xlsx");
-            if (newFile.Exists)
-            {
-                newFile.Delete();
-                newFile = new FileInfo(outDir.FullName + @"\" + fileName + ".xlsx");
-            }
-
-            using (var package = new ExcelPackage(newFile))
-            {
-                // Add a new worksheet to the empty workbook
-                ExcelWorksheet worksheet = null;
-                if (flag)
-                {
-                    worksheet = package.Workbook.Worksheets.Add("Bulk Deals BSE");
-                }
-                else if (!flag)
-                {
-                    worksheet = package.Workbook.Worksheets.Add("Bulk Deals NSE");
-                }
-
-                //Add the headers
-                EnterDataInExcel(data, worksheet);
-
-                // set some document properties
-                package.Workbook.Properties.Title = "Financial Data";
-                package.Workbook.Properties.Author = "Onkesh Bansal";
-                package.Workbook.Properties.Comments = "All data for bulk deals";
-
-                // set some extended property values
-                package.Workbook.Properties.Company = "Flat 221, SLS Serinity, Bangalore";
-
-                // set some custom property values
-                package.Workbook.Properties.SetCustomPropertyValue("Checked by", "Onkesh Bansal");
-                package.Workbook.Properties.SetCustomPropertyValue("AssemblyName", "EPPlus");
-                // save our new workbook and we are done!
-                package.Save();
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("Excel file created , you can find the file at " + outDir + "\\" + fileName + ".xlsx");
-        }
-
-        /// <summary>
-        /// Sets the date and wait.
-        /// </summary>
-        /// <param name="driver">Selenium WebDriver Object.</param>
-        /// <param name="date">The date.</param>
-        private static void SetDateAndWait(IWebDriver driver, DateTime date)
-        {
-            ChangeDateInSite(driver, date);
-            Console.WriteLine("Date set to " + date.ToShortDateString() + " and waiting...");
-            System.Threading.Thread.Sleep(2000);
         }
     }
 }
