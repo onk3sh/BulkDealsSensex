@@ -2,7 +2,7 @@
 
 ## Description
 
-Financial data output for all large volume deals executed for any data and Indian Stock Exchanges (__BSE/NSE__).
+Financial data output for all large volume deals executed for any data and Indian Stock Exchanges (**BSE/NSE**).
 
 **_This is a utility application_**
 
@@ -15,21 +15,22 @@ Financial data output for all large volume deals executed for any data and India
 | Automation        | Selenium WebDriver v3 |
 | Excel Interaction |       EPPlus v5       |
 | IDE               |  Visual Studio 2019   |
+| Platform          |        Windows        |
 
 ## Steps for execution
 
-Navigate to the 
+1. Open a Command prompt window.
+2. Navigate to the folder containing the application.
+3. Run the following command in the command prompt.
 
-### Run the following command in the command prompt
-
-`BulkDealsSensex.exe <start-date> <end date> <BSE | NSE | both>`
+`BulkDealsSensex.exe <start-date> <end date> <BSE || NSE || both>`
 
 ## Condition/Restrictions
 
-- Start Date || End Date only supported in **DD-MM-YYYY** format.
+- Start Date || End Date is only supported in **DD-MM-YYYY** format.
 
 - Today's date is not supported:
-  - Data is only published at the source on the next calendar day.
+  - Data for today's date is published at the source on the next calendar day.
 
 ## Result
 
@@ -39,15 +40,16 @@ Post completion of the operation successfully, an XLSX file will be created insi
 
 ## Sample Commands
 
-BulkDealsSensex.exe 01-04-2020 10-04-2020 BSE
+`BulkDealsSensex.exe 01-04-2020 10-04-2020 BSE`
 
-BulkDealsSensex.exe 01-04-2020 10-04-2020 NSE
+`BulkDealsSensex.exe 01-04-2020 10-04-2020 NSE`
 
-BulkDealsSensex.exe 01-04-2020 10-04-2020 both
+`BulkDealsSensex.exe 01-04-2020 10-04-2020 both`
 
 ## Change Log - Version 2.0
 
 - Added support to run the application standalone without providing commandline arguments.
+
   - When the application is executed without giving the arguments, the data between `Yesterday` and `Day before Yesterday` will be extracted.
 
 - Added support for dates with formating inside the output excel files.
