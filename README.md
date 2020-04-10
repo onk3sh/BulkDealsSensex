@@ -19,9 +19,11 @@ Run the following command in the command prompt
 
 ## Sample Commands
 
- BulkDealsSensex.exe 01-10-2017 10-10-2017 BSE
- BulkDealsSensex.exe 01-10-2017 10-10-2017 NSE
- BulkDealsSensex.exe 01-10-2017 10-10-2017 both
+ BulkDealsSensex.exe 01-04-2020 10-04-2020 BSE
+
+ BulkDealsSensex.exe 01-04-2020 10-04-2020 NSE
+
+ BulkDealsSensex.exe 01-04-2020 10-04-2020 both
 
 ## Change Log - Version 2.0
 
