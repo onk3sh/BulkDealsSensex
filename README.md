@@ -2,37 +2,40 @@
 
 ## Description
 
-Financial data output for all large volume deals executed for any data and Indian Stock Exchange (BSE/NSE).
-**_Utility to fetch data for bulk deals for BSE and NSE_**
+Financial data output for all large volume deals executed for any data and Indian Stock Exchanges (__BSE/NSE__).
+
+**_This is a utility application_**
 
 ## Technology Stack
 
-| Tech       |   Name with Version   |
-| ---------- | :-------------------: |
-| Language   |          C#           |
-| Framework  |       .NET v4.5       |
-| Automation | Selenium WebDriver v3 |
-| Excel      |       EPPlus v5       |
-| IDE        |  Visual Studio 2019   |
+| Tech              |   Name with Version   |
+| ----------------- | :-------------------: |
+| Language          |          C#           |
+| Framework         |       .NET v4.5       |
+| Automation        | Selenium WebDriver v3 |
+| Excel Interaction |       EPPlus v5       |
+| IDE               |  Visual Studio 2019   |
 
 ## Steps for execution
 
+Navigate to the 
+
 ### Run the following command in the command prompt
 
-BulkDealsSensex.exe start date end date BSE | NSE | both>
+`BulkDealsSensex.exe <start-date> <end date> <BSE | NSE | both>`
 
 ## Condition/Restrictions
 
-- Start Date / End Date supported FORMAT = DD-MM-YYYY
+- Start Date || End Date only supported in **DD-MM-YYYY** format.
 
-  - **_No other format will work._**
-
-- Today's date is not supported
-  - Data is only published at the source only the next calendar day.
+- Today's date is not supported:
+  - Data is only published at the source on the next calendar day.
 
 ## Result
 
-File: BSE.xlsx || NSE.xlsx || BSE_NSE_Bulk Deals.xlsx will will be created in the "Documents" folder.
+Post completion of the operation successfully, an XLSX file will be created inside the **Documents** folder.
+
+`File: BSE.xlsx || NSE.xlsx || BSE_NSE_Bulk_Deals.xlsx`
 
 ## Sample Commands
 
@@ -44,22 +47,31 @@ BulkDealsSensex.exe 01-04-2020 10-04-2020 both
 
 ## Change Log - Version 2.0
 
+- Added support to run the application standalone without providing commandline arguments.
+  - When the application is executed without giving the arguments, the data between `Yesterday` and `Day before Yesterday` will be extracted.
+
 - Added support for dates with formating inside the output excel files.
 
 - Updated logic to output only a single file when calling the program with "both" argument.
 
-  - The data for respective exchanges will be represented in different tabs.
+  - Respective exchanges data will be created in different tabs.
 
-- Upgraded all packages in the program
+- Upgraded all packages in the program to latest versions.
 
-  - Compatible with the latest version of Chrome (Version 81.0.4044.92 (Official Build) (64-bit) at the time of publishing)
-  - Click to download supported chromedriver: [Chromedriver version 81.0.4044.69](https://chromedriver.storage.googleapis.com/index.html?path=81.0.4044.69/)
+  - Selenium Webdriver
+  - EPPlus
+
+- Compatible with the latest version of Chrome (Version 81.0.4044.92 (Official Build) (64-bit) at the time of publishing)
+
+  - Download supported chromedriver: [Chromedriver version 81.0.4044.69](https://chromedriver.storage.googleapis.com/index.html?path=81.0.4044.69/) from here.
 
 - Added a copy of the application into the codebase as well.
   - You can download the release version 2.0 zip file from the 'Release Build' folder
 
-## Known Issues
+## Known Issue
 
-One known issue is for the presence of the error message for timeout in the application dialog. This is thrown from the chromedriver.exe.
+One known issue is for the presence of the error message for timeout in the application dialog. This is thrown from the `chromedriver.exe`.
+
 Application is still running perfectly in the background.
-[More info for the issue can be found here](https://stackoverflow.com/questions/60114639/timed-out-receiving-message-from-renderer-0-100-log-messages-using-chromedriver)
+
+[More info for the issue can be found on stackoverflow.](https://stackoverflow.com/questions/60114639/timed-out-receiving-message-from-renderer-0-100-log-messages-using-chromedriver)
